@@ -122,16 +122,15 @@ class LayoutPolicy(BrowserView):
         context = self.context
         portal_state = getMultiAdapter(
             (context, self.request), name=u'plone_portal_state')
+        body_class = ''
 
         # template class (required)
-        name = ''
-        if isinstance(template, ViewPageTemplateFile) or \
-           isinstance(template, ZopeViewPageTemplateFile):
-            # Browser view
-            name = view.__name__
-        else:
+        name = getattr(view, '__name__', None)
+        if name is None and hasattr(template, 'getId'):
             name = template.getId()
-        body_class = 'template-%s' % name
+
+        if name:
+            body_class += 'template-%s' % name
 
         # portal type class (optional)
         normalizer = queryUtility(IIDNormalizer)
